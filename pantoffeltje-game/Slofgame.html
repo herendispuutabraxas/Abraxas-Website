@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>'t Pantoffeltje — Pilsje Rent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pf-dark:    #2a1010;
+    --pf-wine:    #4a1e1a;
+    --pf-red:     #8a2a24;
+    --pf-brick:   #a83a2a;
+    --pf-gold:    #d4a548;
+    --pf-cream:   #f5e6c8;
+    --pf-wood-l:  #a06542;
+    --pf-wood-m:  #7a4527;
+    --pf-wood-d:  #4a2a18;
+    --pf-black:   #180808;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: var(--pf-black);
+    color: var(--pf-cream);
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at top, rgba(212, 165, 72, 0.08), transparent 60%),
+      radial-gradient(ellipse at bottom, rgba(138, 42, 36, 0.15), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  h1 {
+    font-size: clamp(1rem, 3vw, 1.6rem);
+    margin-bottom: 0.4rem;
+    color: var(--pf-gold);
+    text-shadow: 3px 3px 0 var(--pf-black), 6px 6px 0 rgba(0,0,0,0.4);
+    text-align: center;
+    letter-spacing: 2px;
+    z-index: 1;
+    position: relative;
+  }
+  .subtitle {
+    font-size: clamp(0.55rem, 1.4vw, 0.75rem);
+    color: var(--pf-cream);
+    opacity: 0.7;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+    text-align: center;
+    z-index: 1;
+    position: relative;
+  }
+  .game-container {
+    position: relative;
+    max-width: 100%;
+    z-index: 1;
+  }
+  canvas {
+    background: var(--pf-black);
+    border: 4px solid var(--pf-gold);
+    box-shadow:
+      0 0 0 3px var(--pf-black),
+      0 0 0 6px var(--pf-wood-d),
+      0 10px 30px rgba(0, 0, 0, 0.7),
+      0 0 40px rgba(212, 165, 72, 0.12);
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .score-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    font-size: clamp(0.6rem, 1.6vw, 0.85rem);
+    gap: 2rem;
+    width: 100%;
+    max-width: 800px;
+    padding: 0 4px;
+    z-index: 1;
+    position: relative;
+  }
+  .score { color: var(--pf-cream); }
+  .high-score { color: var(--pf-gold); }
+  .high-score.new { animation: pulse 0.6s ease-out; }
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); color: var(--pf-cream); }
+    100% { transform: scale(1); }
+  }
+  .instruction {
+    margin-top: 0.8rem;
+    font-size: clamp(0.5rem, 1.3vw, 0.65rem);
+    opacity: 0.5;
+    text-align: center;
+    z-index: 1;
+    position: relative;
+    line-height: 1.6;
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(24, 8, 8, 0.9);
+    color: var(--pf-cream);
+    text-align: center;
+    padding: 20px;
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.3s ease-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .overlay.hidden { display: none; }
+  .overlay h2 {
+    font-size: clamp(0.9rem, 2.6vw, 1.5rem);
+    margin-bottom: 1.2rem;
+    letter-spacing: 2px;
+  }
+  .overlay h2.start { color: var(--pf-gold); }
+  .overlay h2.gameover {
+    color: var(--pf-brick);
+    animation: shake 0.5s ease-out;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-4px) rotate(-1deg); }
+    40% { transform: translateX(4px) rotate(1deg); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
+  }
+  .overlay p {
+    font-size: clamp(0.5rem, 1.5vw, 0.7rem);
+    margin-bottom: 0.55rem;
+    line-height: 1.6;
+  }
+  .overlay .rules {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0.8rem 0 1.2rem;
+  }
+  .overlay .rule {
+    color: var(--pf-cream);
+    opacity: 0.85;
+  }
+  .overlay .rule strong { color: var(--pf-gold); }
+  .overlay .cta {
+    margin-top: 1.2rem;
+    color: var(--pf-gold);
+    animation: blink 1.2s infinite;
+  }
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+  }
+  .footer {
+    margin-top: 1.5rem;
+    font-size: 0.55rem;
+    opacity: 0.4;
+    z-index: 1;
+    position: relative;
+    letter-spacing: 1px;
+  }
+  .back-home {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    font-size: 0.55rem;
+    letter-spacing: 1px;
+    color: var(--pf-cream);
+    text-decoration: none;
+    background: linear-gradient(180deg, var(--pf-red), var(--pf-wine));
+    border: 2px solid var(--pf-gold);
+    box-shadow: 0 0 0 2px var(--pf-black), 0 6px 16px rgba(0, 0, 0, 0.55);
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  }
+  .back-home:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: 0 0 0 2px var(--pf-black), 0 8px 20px rgba(0, 0, 0, 0.6);
+  }
+  .back-home:active {
+    transform: translateY(0);
+  }
+  @media (max-width: 640px) {
+    .back-home {
+      font-size: 0.48rem;
+      padding: 8px 10px;
+      top: 10px;
+      left: 10px;
+    }
+  }
+</style>
+</head>
+<body>
+  <a class="back-home" href="../index.html" aria-label="Terug naar de website">← TERUG NAAR ABRAXAS</a>
+  <h1>'t PANTOFFELTJE</h1>
+  <p class="subtitle">— PILSJE RENT —</p>
+
+  <div class="game-container">
+    <canvas id="game" width="800" height="300"></canvas>
+    <div id="loadingOverlay" class="overlay">
+      <h2 class="start">TAPPEN...</h2>
+      <p>Bier wordt ingeschonken</p>
+    </div>
+    <div id="startOverlay" class="overlay hidden">
+      <h2 class="start">KLAAR VOOR EEN BIERTJE?</h2>
+      <div class="rules">
+        <p class="rule"><strong>SPRING</strong> over barkrukken en slangen</p>
+        <p class="rule"><strong>NIET SPRINGEN</strong> als de haan hoog vliegt!</p>
+        <p class="rule"><strong>BUK</strong> als de haan laag vliegt!</p>
+      </div>
+      <p class="cta">SPATIE / W OF TAP OM TE STARTEN</p>
+    </div>
+    <div id="gameOverOverlay" class="overlay hidden">
+      <h2 class="gameover">MORSEN!</h2>
+      <p id="finalScore">Afstand: 0m</p>
+      <p id="newRecord" style="color:var(--pf-gold); display:none;">🏆 NIEUW RECORD! 🏆</p>
+      <p class="cta">SPATIE VOOR NOG EEN RONDJE</p>
+    </div>
+  </div>
+
+  <div class="score-panel">
+    <span class="score">SCORE: <span id="score">0</span>M</span>
+    <span class="high-score">RECORD: <span id="highScore">0</span>M</span>
+  </div>
+
+  <p class="instruction">
+    SPATIE / W / TAP = SPRINGEN · PIJL OMLAAG / S = BUKKEN<br>
+    Korte Putstraat 11 · 's-Hertogenbosch
+  </p>
+  <p class="footer">v2.0 — proost 🍻</p>
+
+<script>
+(() => {
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  const W = canvas.width;
+  const H = canvas.height;
+  const GROUND_Y = H - 50;
+
+  // ============ PIXEL-ART BACKGROUND (offscreen, low-res, upscaled) ============
+  // Achtergrond wordt op 200x75 getekend en dan 4x opgeschaald voor scherpe pixels
+  const PIX_SCALE = 4;
+  const PIX_W = W / PIX_SCALE;   // 200
+  const PIX_H = H / PIX_SCALE;   // 75
+  const PIX_GROUND_Y = GROUND_Y / PIX_SCALE; // 62.5, round to 63
+
+  const bgCanvas = document.createElement('canvas');
+  bgCanvas.width = PIX_W;
+  bgCanvas.height = PIX_H;
+  const bgCtx = bgCanvas.getContext('2d');
+  bgCtx.imageSmoothingEnabled = false;
+
+  // Pantoffeltje palette (kroegvibe)
+  const PAL = {
+    dark:    '#180808',
+    wine:    '#2a1010',
+    wineDk:  '#1e0a0a',
+    wall:    '#3a1614',
+    wallHi:  '#5a1e1a',
+    red:     '#8a2a24',
+    gold:    '#d4a548',
+    goldHi:  '#e6c078',
+    cream:   '#f5e6c8',
+    woodL:   '#a06542',
+    woodM:   '#7a4527',
+    woodD:   '#4a2a18',
+    woodShd: '#2a1810',
+    bottle:  '#0a0303',
+    bottleHi:'#2a1010',
+    pear: '#7eaa3a',
+    pearHi: '#a8cf59',
+    pearDark: '#5a7d2c',
+    pearStem: '#6b3d22'
+  };
+
+  // ============ STATE ============
+  let gameState = 'loading';
+  let score = 0;
+  let highScore = parseInt(localStorage.getItem('pantoffeltjeHighScore') || '0', 10);
+  let baseSpeed = 3.1;
+  let gameSpeed = baseSpeed;
+  let obstacles = [];
+  let groundOffset = 0;
+  let bgOffset = 0;
+  let frameCount = 0;
+  let spawnCooldown = 60;
+  let deathShake = 0;
+  let sinceStartFrames = 0;
+
+  document.getElementById('highScore').textContent = highScore;
+
+  // ============ IMAGE LOADING ============
+  const IMG = {
+    bavaria: new Image(),
+    barkruk: new Image(),
+    haan:    new Image()
+  };
+  IMG.bavaria.src = 'assets/bavaria.png';
+  IMG.barkruk.src = 'assets/barkruk.webp';
+  IMG.haan.src    = 'assets/haan.png';
+
+  let loadedCount = 0;
+  const totalToLoad = 3;
+  function onLoad() {
+    loadedCount++;
+    if (loadedCount === totalToLoad) {
+      buildBackground();
+      document.getElementById('loadingOverlay').classList.add('hidden');
+      document.getElementById('startOverlay').classList.remove('hidden');
+      gameState = 'start';
+    }
+  }
+  function onErr(name) {
+    console.error('Failed to load', name);
+    // still count so game can start
+    onLoad();
+  }
+  Object.entries(IMG).forEach(([name, img]) => {
+    img.onload = onLoad;
+    img.onerror = () => onErr(name);
+  });
+
+  // ============ PLAYER ============
+  // Bavaria pilsglas is smal en hoog. Sprite ~42x66
+  const player = {
+    x: 80,
+    y: GROUND_Y - 66,
+    w: 42,
+    h: 66,
+    standW: 42,
+    standH: 66,
+    duckW: 66,
+    duckH: 38,
+    vy: 0,
+    jumping: false,
+    ducking: false,
+    bob: 0
+  };
+
+  const GRAVITY = 0.55;
+  const JUMP_POWER = -12;
+  const JUMP_HOLD_MAX = 12;
+  const JUMP_HOLD_FORCE = 0.23;
+  let isJumpHeld = false;
+  let jumpHoldFrames = 0;
+
+  function jump() {
+    if (!player.jumping) {
+      setDuck(false);
+      player.vy = JUMP_POWER;
+      player.jumping = true;
+      jumpHoldFrames = 0;
+    }
+  }
+
+  function setDuck(active) {
+    if (active && !player.ducking) {
+      const prevH = player.h;
+      player.ducking = true;
+      player.w = player.duckW;
+      player.h = player.duckH;
+      if (player.jumping) {
+        // In de lucht: behoud ongeveer het midden zodat het niet teleport.
+        player.y += (prevH - player.h) * 0.5;
+      } else {
+        player.y = GROUND_Y - player.h;
+      }
+      return;
+    }
+    if (!active && player.ducking) {
+      const prevH = player.h;
+      player.ducking = false;
+      player.w = player.standW;
+      player.h = player.standH;
+      if (player.jumping) {
+        player.y -= (player.h - prevH) * 0.5;
+      } else {
+        player.y = GROUND_Y - player.h;
+      }
+    }
+  }
+
+  function drawPlayer() {
+    if (!IMG.bavaria.complete) return;
+    const px = player.x;
+    const py = player.y;
+
+    // Schaduw op de grond
+    const shadowScale = player.jumping ? Math.max(0.4, 1 - (GROUND_Y - py - player.h) / 120) : 1;
+    ctx.fillStyle = `rgba(0, 0, 0, ${0.5 * shadowScale})`;
+    ctx.beginPath();
+    ctx.ellipse(px + player.w/2, GROUND_Y + 4, (player.w/2) * shadowScale, 4 * shadowScale, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Kleine loopwiebel voor karakter
+    const bob = player.jumping ? 0 : Math.sin(player.bob) * 0.6;
+
+    ctx.imageSmoothingEnabled = true;
+    if (player.ducking) {
+      // Horizontale buk-stand: glas draait een kwartslag
+      const cx = px + player.w / 2;
+      const cy = py + player.h / 2 + bob;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(-Math.PI / 2);
+      ctx.drawImage(IMG.bavaria, -player.h / 2, -player.w / 2, player.h, player.w);
+      ctx.restore();
+    } else {
+      ctx.drawImage(IMG.bavaria, px, py + bob, player.w, player.h);
+    }
+    ctx.imageSmoothingEnabled = false;
+  }
+
+  // ============ OBSTAKELS ============
+  function drawHaan(o) {
+    if (!IMG.haan.complete) return;
+    // Kleine flapping animatie: subtiele vertical bob
+    const flap = Math.sin(frameCount * 0.2) * 3;
+    // Schaduw op de grond onder de haan
+    const shadowW = o.w * 0.5;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+    ctx.beginPath();
+    ctx.ellipse(o.x + o.w/2, GROUND_Y + 4, shadowW/2, 3, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Haan gespiegeld tekenen (kop naar links, richting speler)
+    ctx.imageSmoothingEnabled = true;
+    ctx.save();
+    ctx.translate(o.x + o.w, o.y + flap);
+    ctx.scale(-1, 1);
+    ctx.drawImage(IMG.haan, 0, 0, o.w, o.h);
+    ctx.restore();
+    ctx.imageSmoothingEnabled = false;
+  }
+
+  const OBSTACLE_TYPES = {
+    barkruk: {
+      w: 44, h: 62,
+      groundY: () => GROUND_Y - 58,
+      hitbox: { dx: 7, dy: 7, dw: -14, dh: -10 },
+      draw(o) {
+        if (!IMG.barkruk.complete) return;
+        // Schaduw
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.beginPath();
+        ctx.ellipse(o.x + o.w/2, GROUND_Y + 4, o.w/2 - 2, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(IMG.barkruk, o.x, o.y, o.w, o.h);
+        ctx.imageSmoothingEnabled = false;
+      }
+    },
+    slang: {
+      w: 64, h: 44,
+      groundY: () => GROUND_Y - 40,
+      hitbox: { dx: 7, dy: 10, dw: -14, dh: -13 },
+      draw(o) {
+        // Schaduw
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+        ctx.beginPath();
+        ctx.ellipse(o.x + o.w/2, GROUND_Y + 4, o.w/2, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Paarse pixel-slang met opgerichte nek (stijl van referentie) — groter/hoger voor herkenbaarheid
+        const s = 2.6;
+        const ox = (o.x | 0);
+        const wobble = Math.sin(frameCount * 0.18 + o.x * 0.03) * 0.8;
+        const oy = ((o.y + wobble) | 0);
+        const p = (x, y, w, h, color) => {
+          ctx.fillStyle = color;
+          ctx.fillRect(ox + x * s, oy + y * s, w * s, h * s);
+        };
+
+        const dark    = '#3e0b59';
+        const darker  = '#2a0740';
+        const mid     = '#6d1fa3';
+        const mid2    = '#8f33c8';
+        const hi      = '#ba62ee';
+        const hiBright = '#e6c6ff';
+        const belly   = '#d39df2';
+        const bellyDk = '#b877d9';
+        const scaleLn = '#4f1675';
+
+        // Achterste coil-lus (diepte-schaduw, suggereert een tweede wikkeling)
+        p(2, 9, 17, 3, darker);
+        p(4, 8, 12, 1, darker);
+
+        // Buitencontour voorste coil (torus-vorm)
+        p(0, 12, 25, 3, dark);
+        p(1, 11, 22, 1, dark);
+        p(2, 10, 18, 1, dark);
+        p(4, 9, 13, 1, dark);
+        p(1, 15, 22, 1, dark);
+        p(3, 16, 16, 1, dark);
+        p(6, 17, 9, 1, dark);
+
+        // Binnengat van de coil (torus-opening)
+        p(8, 12, 9, 3, darker);
+        p(9, 11, 7, 1, darker);
+        p(9, 15, 7, 1, darker);
+
+        // Coil-vulling rond het gat, in banden voor rondingseffect
+        p(1, 12, 7, 3, mid);
+        p(17, 12, 7, 3, mid);
+        p(4, 10, 14, 2, mid);
+        p(3, 15, 18, 1, mid2);
+        p(2, 13, 3, 1, mid2);
+        p(20, 13, 3, 1, mid2);
+
+        // Buik-schalen (segmenten) langs de onderkant van de coil
+        p(4, 16, 2, 1, belly);
+        p(8, 16, 2, 1, belly);
+        p(12, 16, 2, 1, belly);
+        p(16, 16, 2, 1, belly);
+        p(6, 14, 2, 1, bellyDk);
+        p(15, 14, 2, 1, bellyDk);
+
+        // Schubtextuur (kleine puntjes voor structuur, net als bij de haan)
+        [[2,11],[5,10],[8,10],[11,9],[15,10],[19,11],[22,12],
+         [3,13],[6,13],[10,13],[14,13],[18,13],[21,13],
+         [4,15],[9,14],[13,15],[17,14],[20,14]].forEach(([sx, sy]) => {
+          p(sx, sy, 1, 1, scaleLn);
+        });
+
+        // Highlight-rand bovenop de coil (lichtinval van linksboven)
+        p(3, 9, 12, 1, hi);
+        p(5, 8, 6, 1, hiBright);
+        p(1, 12, 1, 3, hi);
+
+        // Opgerichte nek en kop (driehoekiger, brede kaaklijn zoals referentie)
+        p(14, 4, 3, 7, dark);
+        p(15, 5, 1, 5, mid);
+        p(16, 5, 1, 4, mid2);
+        p(13, 2, 6, 3, dark);
+        p(12, 4, 7, 2, dark);
+        p(14, 3, 4, 1, mid);
+        p(13, 5, 5, 1, mid2);
+        p(15, 3, 2, 1, hi);
+        p(15, 2, 1, 1, hiBright);
+
+        // Wenkbrauwrichel
+        p(14, 1, 3, 1, hiBright);
+
+        // Open bek (donkere holte tussen de kaken)
+        p(13, 5, 3, 1, '#2a0710');
+
+        // Nek buiklijn
+        p(14, 6, 1, 4, belly);
+        p(15, 6, 1, 4, belly);
+
+        // Slagtanden
+        p(15, 6, 1, 2, '#f5e6c8');
+        p(17, 6, 1, 2, '#f5e6c8');
+
+        // Oog en gevorkte tong
+        p(16, 3, 1, 1, '#c12d49');
+        p(17, 3, 1, 1, '#180818');
+        p(15, 2, 1, 1, '#f7d5ff');
+        p(18, 4, 3, 1, '#f15b96');
+        p(21, 2, 1, 1, '#f15b96');
+        p(21, 3, 1, 1, '#f15b96');
+        p(21, 5, 1, 1, '#f15b96');
+        p(21, 6, 1, 1, '#f15b96');
+        p(12, 8, 1, 1, scaleLn);
+        p(13, 7, 1, 1, scaleLn);
+      }
+    },
+    haan: {
+      w: 68, h: 60,
+      groundY: () => GROUND_Y - 130,  // vliegt hoog, precies in sprong-baan: NIET springen
+      hitbox: { dx: 8, dy: 8, dw: -16, dh: -14 },
+      draw: drawHaan
+    },
+    haanLaag: {
+      w: 68, h: 60,
+      groundY: () => GROUND_Y - 92,  // vliegt laag, op stahoogte: BUKKEN verplicht
+      hitbox: { dx: 8, dy: 16, dw: -16, dh: -24 },
+      draw: drawHaan
+    }
+  };
+
+  function pickObstacleType() {
+    // Vroege game: alleen barkruk en slang. Hanen pas na 200m score.
+    const r = Math.random();
+    if (score < 200) {
+      return r < 0.58 ? 'barkruk' : 'slang';
+    }
+    // Na 200m: 40% barkruk, 30% slang, 15% haan hoog (niet springen), 15% haan laag (bukken)
+    if (r < 0.40) return 'barkruk';
+    if (r < 0.70) return 'slang';
+    if (r < 0.85) return 'haan';
+    return 'haanLaag';
+  }
+
+  function spawnObstacle() {
+    const type = pickObstacleType();
+    const cfg = OBSTACLE_TYPES[type];
+    obstacles.push({
+      type,
+      x: W,
+      y: cfg.groundY(),
+      w: cfg.w,
+      h: cfg.h,
+      hitbox: cfg.hitbox
+    });
+  }
+
+  function drawObstacle(o) {
+    OBSTACLE_TYPES[o.type].draw(o);
+  }
+
+  // ============ PIXEL-ART BACKGROUND CONSTRUCTION ============
+  // Prebake een pixelart scene op bgCanvas die groter is dan het scherm zodat we kunnen scrollen.
+  // We maken een 2x-brede bg strip die naadloos loopt.
+  const BG_STRIP_W = PIX_W * 2; // 400 pixels wide op low-res
+  const bgStrip = document.createElement('canvas');
+  bgStrip.width = BG_STRIP_W;
+  bgStrip.height = PIX_H;
+  const stripCtx = bgStrip.getContext('2d');
+  stripCtx.imageSmoothingEnabled = false;
+
+  function px(ctx, x, y, w, h, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(x | 0, y | 0, w | 0, h | 0);
+  }
+
+  function drawPixelPear(c, x, y) {
+    // Kleine pixel-peer voor achtergronddecor
+    px(c, x + 2, y + 0, 1, 1, PAL.pearStem); // steeltje
+    px(c, x + 1, y + 1, 3, 1, PAL.pearDark);
+    px(c, x + 0, y + 2, 5, 2, PAL.pear);
+    px(c, x + 1, y + 4, 3, 2, PAL.pear);
+    px(c, x + 2, y + 3, 1, 1, PAL.pearHi);
+    px(c, x + 1, y + 2, 1, 1, PAL.pearHi);
+    px(c, x + 0, y + 3, 1, 1, PAL.pearDark);
+    px(c, x + 4, y + 3, 1, 1, PAL.pearDark);
+  }
+
+  function buildBackground() {
+    const c = stripCtx;
+    const w = BG_STRIP_W;
+    const h = PIX_H;
+
+    // Sky/muur — donker kastanje met dithering
+    px(c, 0, 0, w, h, PAL.wall);
+    // Subtiel dithering patroon (elke 4x4 een donkere pixel)
+    c.fillStyle = PAL.wineDk;
+    for (let y = 0; y < h - 20; y += 4) {
+      for (let x = ((y / 4) % 2) * 2; x < w; x += 4) {
+        c.fillRect(x, y, 1, 1);
+      }
+    }
+    // Iets warmere accent bovenaan (licht van boven)
+    for (let y = 0; y < 8; y++) {
+      c.fillStyle = `rgba(212, 165, 72, ${0.06 - y * 0.008})`;
+      c.fillRect(0, y, w, 1);
+    }
+
+    // Wandpanelen (verticale strepen — houten lambrisering onder)
+    const panelTop = h - 30;
+    for (let x = 0; x < w; x += 16) {
+      px(c, x, panelTop, 15, 18, PAL.woodM);
+      // schaduw links
+      px(c, x, panelTop, 1, 18, PAL.woodD);
+      // highlight rechts
+      px(c, x + 14, panelTop, 1, 18, PAL.woodL);
+      // Middenlijn
+      px(c, x + 7, panelTop + 2, 1, 14, PAL.woodD);
+    }
+    // Panel top/bottom randlijst
+    px(c, 0, panelTop - 2, w, 2, PAL.woodD);
+    px(c, 0, panelTop - 3, w, 1, PAL.gold);
+    px(c, 0, panelTop + 18, w, 1, PAL.woodD);
+
+    // Bar counter / plank met flessen (net boven de panelen)
+    const shelfY = panelTop - 22;
+    // Plank
+    px(c, 0, shelfY, w, 3, PAL.woodD);
+    px(c, 0, shelfY, w, 1, PAL.woodM);
+    px(c, 0, shelfY + 2, w, 1, PAL.dark);
+
+    // Flessen op de plank — verspreid onregelmatig
+    const bottlePositions = [
+      6, 18, 30, 44, 58, 72, 88, 104, 120, 138, 154, 170, 188, 204, 220, 238, 254, 270, 288, 306, 322, 340, 358, 376, 392
+    ];
+    bottlePositions.forEach((bx, i) => {
+      const type = i % 4;
+      let bh, bw, bcol, bhi;
+      if (type === 0) { bh = 14; bw = 4; bcol = PAL.bottle; bhi = PAL.bottleHi; }
+      else if (type === 1) { bh = 12; bw = 3; bcol = PAL.woodD; bhi = PAL.woodM; }
+      else if (type === 2) { bh = 15; bw = 4; bcol = PAL.dark; bhi = PAL.wall; }
+      else { bh = 11; bw = 3; bcol = PAL.bottle; bhi = PAL.bottleHi; }
+      const by = shelfY - bh;
+      // Body
+      px(c, bx, by + 3, bw, bh - 3, bcol);
+      // Hals
+      px(c, bx + 1, by, bw - 2, 4, bcol);
+      // Dop
+      px(c, bx + 1, by, bw - 2, 1, PAL.gold);
+      // Highlight
+      px(c, bx, by + 4, 1, bh - 5, bhi);
+    });
+
+    // Af en toe een peer op de plank (niet te vaak)
+    const pearSpots = [64, 224, 352];
+    pearSpots.forEach((sx) => {
+      drawPixelPear(c, sx, shelfY - 7);
+    });
+
+    // Hanglampjes (kleine gouden dots) op regelmatige afstanden
+    for (let x = 24; x < w; x += 48) {
+      // Draad
+      px(c, x, 0, 1, 6, PAL.woodD);
+      // Kap
+      px(c, x - 2, 6, 5, 2, PAL.woodD);
+      px(c, x - 1, 8, 3, 2, PAL.gold);
+      // Gloed pixel
+      px(c, x, 10, 1, 1, PAL.cream);
+      // Faint halo
+      c.fillStyle = 'rgba(212, 165, 72, 0.15)';
+      c.fillRect(x - 3, 7, 7, 6);
+    }
+
+    // Ingelijst "portret" op de muur (soort van kruispunt schilderij)
+    for (let fx = 40; fx < w; fx += 200) {
+      const fy = 18;
+      const fw = 22, fh = 14;
+      // Lijst
+      px(c, fx, fy, fw, fh, PAL.gold);
+      px(c, fx + 1, fy + 1, fw - 2, fh - 2, PAL.wine);
+      // "Foto"
+      px(c, fx + 3, fy + 3, fw - 6, fh - 6, PAL.woodM);
+      // Silhouet
+      px(c, fx + fw/2 - 1, fy + 5, 2, 3, PAL.dark); // hoofd
+      px(c, fx + fw/2 - 2, fy + 8, 4, 4, PAL.dark); // torso
+    }
+  }
+
+  function drawBackgroundPixels() {
+    // Teken de strip 2x om naadloos scrollen te krijgen
+    bgCtx.clearRect(0, 0, PIX_W, PIX_H);
+    const scroll = (bgOffset * 0.15 / PIX_SCALE) % BG_STRIP_W;
+    bgCtx.drawImage(bgStrip, -scroll, 0);
+    bgCtx.drawImage(bgStrip, -scroll + BG_STRIP_W, 0);
+
+    // Nu upscalen naar main canvas
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(bgCanvas, 0, 0, W, GROUND_Y);
+  }
+
+  // ============ HOUTEN VLOER (ook pixelart, aparte prebake) ============
+  const FLOOR_STRIP_W = 200; // low-res width
+  const floorStrip = document.createElement('canvas');
+  floorStrip.width = FLOOR_STRIP_W * PIX_SCALE;
+  floorStrip.height = H - GROUND_Y;
+  const floorCtx = floorStrip.getContext('2d');
+  floorCtx.imageSmoothingEnabled = false;
+
+  function buildFloor() {
+    const c = floorCtx;
+    const w = floorStrip.width;
+    const h = floorStrip.height;
+    const P = PIX_SCALE;
+
+    // Basis
+    c.fillStyle = PAL.woodM;
+    c.fillRect(0, 0, w, h);
+
+    // Planken (elke 24 low-res pixels = 96 real pixels)
+    const plankW = 24 * P;
+    for (let x = 0; x < w; x += plankW) {
+      const shade = ((x / plankW) | 0) % 3;
+      const base = shade === 0 ? PAL.woodM : shade === 1 ? PAL.woodL : PAL.woodD;
+      const dark = PAL.woodD;
+      c.fillStyle = base;
+      c.fillRect(x, 0, plankW - P, h);
+
+      // Nerven (horizontale streepjes) op random posities per plank
+      c.fillStyle = 'rgba(42, 24, 16, 0.5)';
+      for (let n = 0; n < 4; n++) {
+        const ny = P * 2 + n * P * 2 + ((x / plankW + n) % 2) * P;
+        const nxStart = x + P + ((n * 7) % (plankW - 4 * P));
+        const nxLen = P * (3 + (n % 3));
+        c.fillRect(nxStart, ny, nxLen, P);
+      }
+
+      // Plank scheiding
+      c.fillStyle = PAL.woodShd;
+      c.fillRect(x + plankW - P, 0, P, h);
+      // Highlight bovenaan de plank
+      c.fillStyle = PAL.woodL;
+      c.fillRect(x, 0, plankW - P, P/2);
+    }
+
+    // Bovenrand (goudlijn)
+    c.fillStyle = PAL.gold;
+    c.fillRect(0, 0, w, P/2);
+  }
+
+  function drawFloor() {
+    const scroll = groundOffset % floorStrip.width;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(floorStrip, -scroll, GROUND_Y);
+    ctx.drawImage(floorStrip, -scroll + floorStrip.width, GROUND_Y);
+  }
+
+  // ============ COLLISION ============
+  function checkCollision(o) {
+    const hb = o.hitbox || { dx: 0, dy: 0, dw: 0, dh: 0 };
+    const ox = o.x + hb.dx;
+    const oy = o.y + hb.dy;
+    const ow = o.w + hb.dw;
+    const oh = o.h + hb.dh;
+
+    const pmargin = 6;
+    const px = player.x + pmargin;
+    const py = player.y + pmargin;
+    const pw = player.w - pmargin * 2;
+    const ph = player.h - pmargin;
+
+    return (
+      px < ox + ow &&
+      px + pw > ox &&
+      py < oy + oh &&
+      py + ph > oy
+    );
+  }
+
+  // ============ UPDATE ============
+  function update() {
+    if (gameState !== 'playing') {
+      if (deathShake > 0) deathShake -= 0.5;
+      // Still animate background subtly on start/gameover?
+      // Nee, static op start/gameover.
+      return;
+    }
+
+    frameCount++;
+    sinceStartFrames++;
+
+    // Player physics
+    if (player.jumping && isJumpHeld && player.vy < 0 && jumpHoldFrames < JUMP_HOLD_MAX) {
+      player.vy -= JUMP_HOLD_FORCE;
+      jumpHoldFrames++;
+    }
+    player.vy += GRAVITY;
+    player.y += player.vy;
+
+    if (player.y >= GROUND_Y - player.h) {
+      player.y = GROUND_Y - player.h;
+      player.vy = 0;
+      player.jumping = false;
+      jumpHoldFrames = 0;
+    }
+
+    // Als je tijdens een sprong bukte, zet na landing de houding correct.
+    if (!player.jumping && player.ducking) {
+      player.y = GROUND_Y - player.h;
+    }
+
+    // Loopwiebel
+    player.bob += 0.35;
+
+    // Scroll
+    groundOffset += gameSpeed;
+    bgOffset += gameSpeed;
+
+    // Move obstacles
+    obstacles.forEach(o => o.x -= gameSpeed);
+    obstacles = obstacles.filter(o => o.x + o.w > -30);
+
+    // Spawn — timing gebaseerd op afstand, niet frames
+    spawnCooldown -= gameSpeed;
+    if (spawnCooldown <= 0) {
+      const lastObstacle = obstacles[obstacles.length - 1];
+      const minGap = 220 + Math.random() * 260;
+      if (!lastObstacle || W - lastObstacle.x > minGap) {
+        spawnObstacle();
+        spawnCooldown = minGap * 0.5;
+      } else {
+        spawnCooldown = 10;
+      }
+    }
+
+    // Collision
+    for (const o of obstacles) {
+      if (checkCollision(o)) {
+        endGame();
+        return;
+      }
+    }
+
+    // Score
+    score += gameSpeed / 8;
+    document.getElementById('score').textContent = Math.floor(score);
+
+    // Rustiger tempo-opbouw: langzamer begin, minder snelle acceleratie
+    gameSpeed = Math.min(baseSpeed + 2.2, baseSpeed + score / 900);
+  }
+
+  // ============ DRAW ============
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    if (deathShake > 0) {
+      ctx.save();
+      ctx.translate(
+        (Math.random() - 0.5) * deathShake,
+        (Math.random() - 0.5) * deathShake
+      );
+    }
+
+    drawBackgroundPixels();
+    drawFloor();
+
+    // Obstakels tekenen — hanen laatst (voor de andere) omdat ze in de lucht zijn
+    obstacles.filter(o => o.type !== 'haan' && o.type !== 'haanLaag').forEach(drawObstacle);
+    drawPlayer();
+    obstacles.filter(o => o.type === 'haan' || o.type === 'haanLaag').forEach(drawObstacle);
+
+    if (deathShake > 0) {
+      ctx.restore();
+    }
+  }
+
+  function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  // ============ FLOW ============
+  function startGame() {
+    gameState = 'playing';
+    score = 0;
+    gameSpeed = baseSpeed;
+    obstacles = [];
+    frameCount = 0;
+    sinceStartFrames = 0;
+    spawnCooldown = 120; // eerste obstakel wat later
+    player.y = GROUND_Y - player.h;
+    player.vy = 0;
+    player.jumping = false;
+    player.ducking = false;
+    player.w = player.standW;
+    player.h = player.standH;
+    isJumpHeld = false;
+    jumpHoldFrames = 0;
+    document.getElementById('score').textContent = '0';
+    document.getElementById('startOverlay').classList.add('hidden');
+    document.getElementById('gameOverOverlay').classList.add('hidden');
+  }
+
+  function endGame() {
+    gameState = 'gameover';
+    deathShake = 8;
+    const finalScore = Math.floor(score);
+    const isNewRecord = finalScore > highScore;
+    if (isNewRecord) {
+      highScore = finalScore;
+      localStorage.setItem('pantoffeltjeHighScore', String(highScore));
+      const hs = document.getElementById('highScore');
+      hs.textContent = highScore;
+      hs.classList.remove('new');
+      void hs.offsetWidth;
+      hs.classList.add('new');
+    }
+    document.getElementById('finalScore').textContent = `Afstand: ${finalScore}m`;
+    document.getElementById('newRecord').style.display = isNewRecord ? 'block' : 'none';
+    document.getElementById('gameOverOverlay').classList.remove('hidden');
+  }
+
+  function handleInputPress() {
+    if (gameState === 'playing') {
+      if (!player.jumping) jump();
+      isJumpHeld = true;
+    } else if (gameState === 'start' || gameState === 'gameover') {
+      if (gameState === 'gameover' && deathShake > 5) return;
+      startGame();
+    }
+  }
+
+  function handleInputRelease() {
+    isJumpHeld = false;
+  }
+
+  function handleDuckPress() {
+    if (gameState === 'playing') {
+      setDuck(true);
+    }
+  }
+
+  function handleDuckRelease() {
+    setDuck(false);
+  }
+
+  // ============ INPUT ============
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+      e.preventDefault();
+      handleInputPress();
+    }
+    if (e.code === 'ArrowDown' || e.code === 'KeyS') {
+      e.preventDefault();
+      handleDuckPress();
+    }
+  });
+  document.addEventListener('keyup', (e) => {
+    if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+      e.preventDefault();
+      handleInputRelease();
+    }
+    if (e.code === 'ArrowDown' || e.code === 'KeyS') {
+      e.preventDefault();
+      handleDuckRelease();
+    }
+  });
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    handleInputPress();
+  }, { passive: false });
+  canvas.addEventListener('touchend', handleInputRelease, { passive: true });
+  canvas.addEventListener('touchcancel', handleInputRelease, { passive: true });
+  canvas.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    handleInputPress();
+  });
+  window.addEventListener('mouseup', handleInputRelease);
+  window.addEventListener('blur', () => {
+    handleInputRelease();
+    handleDuckRelease();
+  });
+  window.addEventListener('keydown', (e) => {
+    if ((e.code === 'Space' || e.code === 'KeyW') && e.target === document.body) e.preventDefault();
+  });
+
+  // Bouw de vloerstrip alvast (hangt niet af van images)
+  buildFloor();
+  // Bouw achtergrond meteen zichtbaar (met of zonder images)
+  buildBackground();
+
+  loop();
+})();
+</script>
+</body>
+</html>

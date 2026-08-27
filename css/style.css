@@ -1,10 +1,28 @@
-/* CSS Styles - Main stylesheet */
+/*--------------------------------------------------------------
+# Start style 
+
+/*--------------------------------------------------------------
+# General
+--------------------------------------------------------------*/
+
 body {
     font-family: "Open Sans", sans-serif;
     color: #000104;
 }
 
 a {
+    color: #000104;
+    ;
+    text-decoration: none;
+}
+
+form {
+    color: #000104;
+    ;
+    text-decoration: none;
+}
+
+form:hover {
     color: #000104;
     text-decoration: none;
 }
@@ -14,11 +32,20 @@ a:hover {
     text-decoration: none;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: "Raleway", sans-serif;
 }
 
-/* Back to top button */
+
+/*--------------------------------------------------------------
+# Back to top button
+--------------------------------------------------------------*/
+
 .back-to-top {
     position: fixed;
     visibility: hidden;
@@ -49,7 +76,11 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 1;
 }
 
-/* Preloader */
+
+/*--------------------------------------------------------------
+# Preloader
+--------------------------------------------------------------*/
+
 #preloader {
     position: fixed;
     top: 0;
@@ -61,7 +92,44 @@ h1, h2, h3, h4, h5, h6 {
     background: #e1e288;
 }
 
-/* Header */
+#preloader:before {
+    content: "";
+    position: fixed;
+    top: calc(50% - 30px);
+    left: calc(50% - 30px);
+    border: 6px solid #7712b4;
+    border-top-color: #7712b4;
+    border-bottom-color: #e1e288;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    -webkit-animation: animate-preloader 1s linear infinite;
+    animation: animate-preloader 1s linear infinite;
+}
+
+@-webkit-keyframes animate-preloader {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes animate-preloader {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+/*--------------------------------------------------------------
+# Header
+--------------------------------------------------------------*/
+
 #header {
     transition: all 0.5s;
     background: #7712b4;
@@ -70,12 +138,57 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom: 1px solid #f9d380;
 }
 
+#header.header-scrolled {
+    border-color: #f9d380;
+    box-shadow: 0px 2px 15px rgba(18, 66, 101, 0.08);
+}
+
+#header .logo {
+    font-size: 30px;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    font-weight: 250;
+    letter-spacing: 0.5px;
+    font-family: "Poppins", sans-serif;
+}
+
+#header .logo a {
+    color: #7712b4;
+}
+
 #header .logo img {
     max-height: 50px;
     width: auto;
 }
 
-/* Navigation */
+@media (max-width: 992px) {
+    #header .logo {
+        font-size: 28px;
+    }
+}
+
+
+/*--------------------------------------------------------------
+# Navigation Menu
+--------------------------------------------------------------*/
+
+.navbar {
+    padding: 0;
+}
+
+.navbar ul {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    list-style: none;
+    align-items: center;
+}
+
+.navbar li {
+    position: relative;
+}
+
 .navbar a,
 .navbar a:focus {
     display: flex;
@@ -88,6 +201,13 @@ h1, h2, h3, h4, h5, h6 {
     transition: 0.3s;
 }
 
+.navbar a i,
+.navbar a:focus i {
+    font-size: 12px;
+    line-height: 0;
+    margin-left: 5px;
+}
+
 .navbar a:hover,
 .navbar .active,
 .navbar .active:focus,
@@ -95,7 +215,150 @@ h1, h2, h3, h4, h5, h6 {
     color: #f9d380;
 }
 
-/* Sections */
+
+/*--------------------------------------------------------------
+# Hero Section
+--------------------------------------------------------------*/
+
+#hero {
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+    background: url("../img/Dispuutsfoto_Tilburg.jpeg") top center;
+    background-size: cover;
+    padding-bottom: 40px;
+}
+
+#hero:before {
+    content: "";
+    background: rgba(255, 255, 255, 0.8);
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+#hero .container {
+    padding-top: 125px;
+    padding-bottom: 75px;
+}
+
+#hero h1 {
+    margin: 0;
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 72px;
+    color: #7712b4;
+    font-family: "Poppins", sans-serif;
+}
+
+#hero h2 {
+    color: #5e5e5e;
+    margin: 10px 0 0 0;
+    font-size: 22px;
+}
+
+#hero .btn-get-started {
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    padding: 14px 50px;
+    border-radius: 5px;
+    transition: 0.5s;
+    margin-top: 30px;
+    color: #fff;
+    background: #f9d380;
+}
+
+#hero .btn-get-started:hover {
+    background: #7712b4;
+}
+
+#hero .icon-boxes {
+    margin-top: 40px;
+}
+
+#hero .icon-box {
+    padding: 50px 30px;
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 0 29px 0 rgba(18, 66, 101, 0.08);
+    transition: all 0.3s ease-in-out;
+    border-radius: 8px;
+    z-index: 1;
+    text-align: center;
+}
+
+#hero .icon-box .title {
+    font-weight: 700;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+#hero .icon-box .title a {
+    color: #7712b4;
+    transition: 0.3s;
+}
+
+#hero .icon-box .description {
+    font-size: 15px;
+    line-height: 28px;
+    margin-bottom: 0;
+}
+
+#hero .icon-box .icon {
+    margin-bottom: 20px;
+    padding-top: 10px;
+    display: inline-block;
+    transition: all 0.3s ease-in-out;
+    font-size: 36px;
+    line-height: 1;
+    color: #7712b4;
+}
+
+#hero .icon-box:hover {
+    transform: scale(1.08);
+}
+
+#hero .icon-box:hover .title a {
+    color: #f9d380;
+}
+
+@media (min-width: 1024px) {
+    #hero {
+        background-attachment: fixed;
+    }
+}
+
+@media (max-height: 800px) {
+    #hero {
+        min-height: auto;
+    }
+}
+
+@media (max-width: 992px) {
+    #hero {
+        min-height: auto;
+    }
+    #hero h1 {
+        font-size: 28px;
+        line-height: 36px;
+    }
+    #hero h2 {
+        font-size: 18px;
+        line-height: 24px;
+    }
+}
+
+
+/*--------------------------------------------------------------
+# Sections General
+--------------------------------------------------------------*/
+
 section {
     padding: 25px 0;
     overflow: hidden;
@@ -125,7 +388,584 @@ section {
     color: #7712b4;
 }
 
-/* Team/Members */
+
+/*--------------------------------------------------------------
+# Inleiding
+--------------------------------------------------------------*/
+
+.about .content h3 {
+    font-weight: 600;
+    font-size: 26px;
+    text-align: center;
+}
+
+.about .content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.about .content ul li {
+    padding-left: 28px;
+    position: relative;
+}
+
+.about .content ul li+li {
+    margin-top: 10px;
+}
+
+.about .content ul i {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    font-size: 20px;
+    color: #7712b4;
+    line-height: 1;
+}
+
+.about .content p:last-child {
+    margin-bottom: 0;
+}
+
+.about .content .btn-learn-more {
+    font-family: "Raleway", sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 1px;
+    display: inline-block;
+    padding: 12px 32px;
+    border-radius: 5px;
+    transition: 0.3s;
+    line-height: 1;
+    color: #7712b4;
+    -webkit-animation-delay: 0.8s;
+    animation-delay: 0.8s;
+    margin-top: 6px;
+    border: 2px solid #7712b4;
+}
+
+.about .content .btn-learn-more:hover {
+    background: #7712b4;
+    color: #fff;
+    text-decoration: none;
+}
+
+.center-block {
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+
+/*--------------------------------------------------------------
+# Uitdaging
+--------------------------------------------------------------*/
+
+.about-video .content {
+    font-size: 15px;
+}
+
+.about-video .content h3 {
+    font-weight: 600;
+    font-size: 26px;
+    text-align: center;
+}
+
+.about-video .content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.about-video .content p:last-child {
+    margin-bottom: 0;
+}
+
+@-webkit-keyframes pulsate-btn {
+    0% {
+        transform: scale(0.6, 0.6);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1, 1);
+        opacity: 0;
+    }
+}
+
+@keyframes pulsate-btn {
+    0% {
+        transform: scale(0.6, 0.6);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1, 1);
+        opacity: 0;
+    }
+}
+
+
+/*--------------------------------------------------------------
+# Nummers
+--------------------------------------------------------------*/
+
+.counts {
+    padding: 30px 0;
+}
+
+.counts p {
+    margin: auto;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 14px;
+    color: #919191;
+}
+
+.counts .count-box {
+    width: 100%;
+    text-align: center;
+}
+
+.counts .count-box span {
+    font-size: 48px;
+    line-height: 48px;
+    display: block;
+    font-weight: 700;
+    color: #7712b4;
+    margin-left: 80px;
+    margin: auto;
+}
+
+.counts .count-box p {
+    padding: 8px 0 0 0;
+    font-family: "Raleway", sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: #7712b4;
+}
+
+
+/*--------------------------------------------------------------
+# Belanghebbenden
+--------------------------------------------------------------*/
+
+.testimonials .testimonial-item {
+    box-sizing: content-box;
+    text-align: center;
+    min-height: 320px;
+}
+
+.testimonials .testimonial-item .testimonial-img {
+    width: 120px;
+    height: 100px;
+    border-radius: 50%;
+    margin: auto;
+    bottom: 0;
+    left: 0;
+    position: bottom;
+}
+
+.testimonials .testimonial-item h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px 0 5px 0;
+    color: #111;
+}
+
+.testimonials .testimonial-item h4 {
+    font-size: 14px;
+    color: #999;
+    margin: 0;
+}
+
+.testimonials .testimonial-item .quote-icon-left,
+.testimonials .testimonial-item .quote-icon-right {
+    color: #c9e3f5;
+    font-size: 26px;
+}
+
+.testimonials .testimonial-item .quote-icon-left {
+    display: inline-block;
+    left: -5px;
+    position: relative;
+}
+
+.testimonials .testimonial-item .quote-icon-right {
+    display: inline-block;
+    right: -5px;
+    position: relative;
+    top: 10px;
+}
+
+.testimonials .testimonial-item p {
+    font-style: italic;
+    margin: 0 15px 15px 15px;
+    padding: 30px;
+    background: #f3f9fd;
+    position: relative;
+    margin-bottom: 40px;
+    border-radius: 6px;
+}
+
+
+/*--------------------------------------------------------------
+# Uitleg
+--------------------------------------------------------------*/
+
+.cta {
+    background: #233060;
+    background-size: cover;
+    padding: 60px 0;
+}
+
+.cta h3 {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.cta p {
+    color: #fff;
+    text-align: left;
+}
+
+.cta .cta-btn {
+    font-family: "Raleway", sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 1px;
+    display: inline-block;
+    padding: 10px 35px;
+    border-radius: 5px;
+    transition: 0.5s;
+    margin-top: 10px;
+    border: 2px solid #fff;
+    color: #fff;
+}
+
+.cta .cta-btn:hover {
+    background: #fff;
+    color: #2487ce;
+}
+
+
+/*--------------------------------------------------------------
+# interactieve kaart
+--------------------------------------------------------------*/
+
+#kaart {
+    background-color: lightcyan;
+    width: 100%;
+    height: 525px;
+    padding: 30px;
+}
+
+#legenda {
+    position: absolute;
+    left: 10px;
+    bottom: 5px;
+    z-index: 1000;
+}
+
+#legenda2 {
+    position: absolute;
+    left: 10px;
+    bottom: 5px;
+    z-index: 1000;
+    display: none;
+}
+
+#legenda3 {
+    position: absolute;
+    left: 10px;
+    bottom: 5px;
+    z-index: 1000;
+    display: none;
+}
+
+#legenda4 {
+    position: absolute;
+    left: 10px;
+    bottom: 5px;
+    z-index: 1000;
+    display: none;
+}
+
+#legenda5 {
+    position: absolute;
+    left: 10px;
+    bottom: 5px;
+    z-index: 1000;
+    display: none;
+}
+
+
+/*--------------------------------------------------------------
+# Advies
+--------------------------------------------------------------*/
+
+.cta2 {
+    background: #084ca5;
+    background-size: cover;
+    padding: 60px 0;
+}
+
+.cta2 h3 {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.cta2 p {
+    color: #fff;
+    text-align: left;
+}
+
+.cta2 .cta2-btn {
+    font-family: "Raleway", sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 1px;
+    display: inline-block;
+    padding: 10px 35px;
+    border-radius: 5px;
+    transition: 0.5s;
+    margin-top: 10px;
+    border: 2px solid #fff;
+    color: #fff;
+}
+
+.cta2 .cta2-btn:hover {
+    background: #fff;
+    color: #2487ce;
+}
+
+
+/*--------------------------------------------------------------
+# Fotogalerij
+--------------------------------------------------------------*/
+
+.portfolio .portfolio-item {
+    margin-bottom: 30px;
+}
+
+.portfolio #portfolio-flters {
+    padding: 0;
+    margin: 0 auto 35px auto;
+    list-style: none;
+    text-align: center;
+    border-radius: 50px;
+    padding: 2px 15px;
+}
+
+.portfolio #portfolio-flters li {
+    cursor: pointer;
+    display: inline-block;
+    padding: 10px 15px 8px 15px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #444444;
+    margin-bottom: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+.portfolio #portfolio-flters li:hover,
+.portfolio #portfolio-flters li.filter-active {
+    color: #2487ce;
+}
+
+.portfolio #portfolio-flters li:last-child {
+    margin-right: 0;
+}
+
+.portfolio .portfolio-wrap {
+    transition: 0.3s;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.portfolio .portfolio-wrap::before {
+    content: "";
+    background: rgba(36, 135, 206, 0.6);
+    position: absolute;
+    left: 30px;
+    right: 30px;
+    top: 30px;
+    bottom: 30px;
+    transition: all ease-in-out 0.3s;
+    z-index: 2;
+    opacity: 0;
+}
+
+.portfolio .portfolio-wrap .portfolio-info {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    text-align: center;
+    z-index: 3;
+    transition: all ease-in-out 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.portfolio .portfolio-wrap .portfolio-info::before {
+    display: block;
+    content: "";
+    width: 48px;
+    height: 48px;
+    position: absolute;
+    top: 35px;
+    left: 35px;
+    border-top: 3px solid #fff;
+    border-left: 3px solid #fff;
+    transition: all 0.5s ease 0s;
+    z-index: 9994;
+}
+
+.portfolio .portfolio-wrap .portfolio-info::after {
+    display: block;
+    content: "";
+    width: 48px;
+    height: 48px;
+    position: absolute;
+    bottom: 35px;
+    right: 35px;
+    border-bottom: 3px solid #fff;
+    border-right: 3px solid #fff;
+    transition: all 0.5s ease 0s;
+    z-index: 9994;
+}
+
+.portfolio .portfolio-wrap .portfolio-info h4 {
+    font-size: 20px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.portfolio .portfolio-wrap .portfolio-info p {
+    color: #ffffff;
+    font-size: 14px;
+    text-transform: uppercase;
+    padding: 0;
+    margin: 0;
+}
+
+.portfolio .portfolio-wrap .portfolio-links {
+    text-align: center;
+    z-index: 4;
+}
+
+.portfolio .portfolio-wrap .portfolio-links a {
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 2px;
+    font-size: 28px;
+    display: inline-block;
+    transition: 0.3s;
+}
+
+.portfolio .portfolio-wrap .portfolio-links a:hover {
+    color: #fff;
+}
+
+.portfolio .portfolio-wrap:hover::before {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 1;
+}
+
+.portfolio .portfolio-wrap:hover .portfolio-info {
+    opacity: 1;
+}
+
+.portfolio .portfolio-wrap:hover .portfolio-info::before {
+    top: 15px;
+    left: 15px;
+}
+
+.portfolio .portfolio-wrap:hover .portfolio-info::after {
+    bottom: 15px;
+    right: 15px;
+}
+
+
+/*--------------------------------------------------------------
+# Fotogalerij Details
+--------------------------------------------------------------*/
+
+.portfolio-details {
+    padding-top: 40px;
+}
+
+.portfolio-details .portfolio-details-slider img {
+    width: 100%;
+}
+
+.portfolio-details .portfolio-details-slider .swiper-pagination {
+    margin-top: 20px;
+    position: relative;
+}
+
+.portfolio-details .portfolio-details-slider .swiper-pagination .swiper-pagination-bullet {
+    width: 12px;
+    height: 12px;
+    background-color: #fff;
+    opacity: 1;
+    border: 1px solid #2487ce;
+}
+
+.portfolio-details .portfolio-details-slider .swiper-pagination .swiper-pagination-bullet-active {
+    background-color: #2487ce;
+}
+
+.portfolio-details .portfolio-info {
+    padding: 30px;
+    box-shadow: 0px 0 30px rgba(18, 66, 101, 0.08);
+}
+
+.portfolio-details .portfolio-info h3 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.portfolio-details .portfolio-info ul {
+    list-style: none;
+    padding: 0;
+    font-size: 15px;
+}
+
+.portfolio-details .portfolio-info ul li+li {
+    margin-top: 10px;
+}
+
+.portfolio-details .portfolio-description {
+    padding-top: 30px;
+}
+
+.portfolio-details .portfolio-description h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.portfolio-details .portfolio-description p {
+    padding: 0;
+}
+
+
+/*--------------------------------------------------------------
+# Team
+--------------------------------------------------------------*/
+
 .team .member {
     margin-bottom: 20px;
     overflow: hidden;
@@ -148,45 +988,452 @@ section {
     object-position: center top;
 }
 
+.team .member .social {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 40px;
+    opacity: 0;
+    transition: ease-in-out 0.3s;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.85);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.team .member .social a {
+    transition: color 0.3s;
+    color: #124265;
+    margin: 0 10px;
+    display: inline-block;
+}
+
+.team .member .social a:hover {
+    color: #2487ce;
+}
+
+.team .member .social i {
+    font-size: 18px;
+    margin: 0 2px;
+    line-height: 0;
+}
+
 .team .member .member-info {
+    padding: 25px 15px;
+}
+
+.team .member .member-info h4 {
+    font-weight: 700;
+    margin-bottom: 5px;
+    font-size: 18px;
+    color: #124265;
+}
+
+.team .member .member-info span {
+    display: block;
+    font-size: 13px;
+    font-weight: 400;
+    color: #aaaaaa;
+}
+
+.team .member .member-info p {
+    font-style: italic;
+    font-size: 14px;
+    line-height: 26px;
+    color: #777777;
+}
+
+.team .member:hover .social {
+    opacity: 1;
+}
+
+
+/*--------------------------------------------------------------
+# Contact
+--------------------------------------------------------------*/
+
+.contact .info {
+    width: 100%;
+    background: #fff;
+}
+
+.contact .info i {
+    font-size: 20px;
+    color: #2487ce;
+    float: left;
+    width: 44px;
+    height: 44px;
+    background: #e3f0fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+.contact .info h4 {
+    padding: 0 0 0 60px;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #124265;
+}
+
+.contact .info p {
+    padding: 0 0 0 60px;
+    margin-bottom: 0;
+    font-size: 14px;
+    color: #217bbc;
+}
+
+.contact .info .email,
+.contact .info .phone {
+    margin-top: 40px;
+}
+
+.contact .info .email:hover i,
+.contact .info .address:hover i,
+.contact .info .phone:hover i {
+    background: #2487ce;
+    color: #fff;
+}
+
+.contact .php-email-form {
+    width: 100%;
+    background: #fff;
+}
+
+.contact .php-email-form .form-group {
+    padding-bottom: 8px;
+}
+
+.contact .php-email-form .error-message {
+    display: none;
+    color: #fff;
+    background: #ed3c0d;
+    text-align: left;
+    padding: 15px;
+    font-weight: 600;
+}
+
+.contact .php-email-form .error-message br+br {
+    margin-top: 25px;
+}
+
+.contact .php-email-form .sent-message {
+    display: none;
+    color: #fff;
+    background: #18d26e;
+    text-align: center;
+    padding: 15px;
+    font-weight: 600;
+}
+
+.contact .php-email-form .loading {
+    display: none;
+    background: #fff;
+    text-align: center;
     padding: 15px;
 }
 
-.team .member h4 {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 10px 0 5px 0;
+.contact .php-email-form .loading:before {
+    content: "";
+    display: inline-block;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    margin: 0 10px -6px 0;
+    border: 3px solid #18d26e;
+    border-top-color: #eee;
+    -webkit-animation: animate-loading 1s linear infinite;
+    animation: animate-loading 1s linear infinite;
+}
+
+.contact .php-email-form input,
+.contact .php-email-form textarea {
+    border-radius: 0;
+    box-shadow: none;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+.contact .php-email-form input:focus,
+.contact .php-email-form textarea:focus {
+    border-color: #2487ce;
+}
+
+.contact .php-email-form input {
+    height: 44px;
+}
+
+.contact .php-email-form textarea {
+    padding: 10px 12px;
+}
+
+.contact .php-email-form button[type=submit] {
+    background: #e1e288;
+    border: 0;
+    padding: 10px 30px;
+    color: #fff;
+    transition: 0.4s;
+    border-radius: 4px;
+}
+
+.contact .php-email-form button[type=submit]:hover {
+    background: #3194db;
+}
+
+@-webkit-keyframes animate-loading {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes animate-loading {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+/*--------------------------------------------------------------
+# Leden Tables
+--------------------------------------------------------------*/
+
+.leden-tables {
+    background-color: #f9d380;
+    padding: 40px 0;
+}
+
+.leden-tables .section-title h2 {
     color: #7712b4;
 }
 
-/* Footer */
-#footer {
-    background: #233060;
+.leden-tables .table {
+    background-color: #fff;
+}
+
+.leden-tables .table thead {
+    background-color: #7712b4;
     color: #fff;
-    padding: 40px 0 20px;
 }
 
-.footer-top {
-    padding: 30px 0;
+.leden-tables .table thead th {
+    color: #fff;
+    border-color: #7712b4;
 }
 
-.footer-contact h3 {
+
+/*--------------------------------------------------------------
+# Footer
+--------------------------------------------------------------*/
+
+#footer {
+    color: #fff;
+    font-size: 14px;
+    background: #7712b4;
+    box-shadow: 0px 2px 15px rgba(18, 66, 101, 0.08);
+}
+
+#footer .footer-top {
+    padding: 60px 0 30px 0;
+    background: #7712b4;
+}
+
+#footer .footer-top .footer-contact {
+    margin-bottom: 30px;
+}
+
+#footer .footer-top .footer-contact h3 {
+    font-size: 24px;
+    margin: 0 0 15px 0;
+    padding: 2px 0 2px 0;
+    line-height: 1;
+    font-weight: 600;
     color: #f9d380;
-    margin-bottom: 15px;
 }
 
-.footer-links a {
+#footer .footer-top .footer-contact p {
+    font-size: 14px;
+    line-height: 24px;
+    margin-bottom: 0;
+    font-family: "Raleway", sans-serif;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+#footer .footer-top .footer-contact p a {
     color: #f9d380;
+    transition: 0.3s;
+}
+
+#footer .footer-top .footer-contact p a:hover {
+    color: #fff;
+}
+
+#footer .footer-top .footer-contact p strong {
+    color: #fff;
+}
+
+#footer .footer-top h4 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #f9d380;
+    position: relative;
+    padding-bottom: 12px;
+}
+
+#footer .footer-top p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+}
+
+#footer .footer-top .footer-links {
+    margin-bottom: 30px;
+}
+
+#footer .footer-top .footer-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#footer .footer-top .footer-links ul i {
+    padding-right: 2px;
+    color: #f9d380;
+    font-size: 18px;
+    line-height: 1;
+}
+
+#footer .footer-top .footer-links ul li {
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+}
+
+#footer .footer-top .footer-links ul li:first-child {
+    padding-top: 0;
+}
+
+#footer .footer-top .footer-links ul a {
+    color: rgba(255, 255, 255, 0.8);
+    transition: 0.3s;
+    display: inline-block;
+    line-height: 1;
+}
+
+#footer .footer-top .footer-links ul a:hover {
+    text-decoration: none;
+    color: #f9d380;
+}
+
+#footer .copyright {
+    padding-top: 5px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+#footer .credits {
+    padding-top: 5px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+#footer .social-links a {
+    font-size: 18px;
+    display: inline-block;
+    background: #f9d380;
+    color: #7712b4;
+    line-height: 1;
+    padding: 8px 0;
+    margin-right: 4px;
+    border-radius: 5px;
+    text-align: center;
+    width: 36px;
+    height: 36px;
+    transition: 0.3s;
+}
+
+#footer .social-links a:hover {
+    background: #fff;
+    color: #7712b4;
     text-decoration: none;
 }
 
-.footer-links a:hover {
-    color: #fff;
+
+/*--------------------------------------------------------------
+# Info Box (for contact page)
+--------------------------------------------------------------*/
+
+.info-box {
+  padding: 30px;
+  background: #fff;
+  box-shadow: 0px 2px 15px rgba(18, 66, 101, 0.08);
+  border-radius: 4px;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
 }
 
-/* Responsive */
-@media (max-width: 992px) {
-    #header .logo {
-        font-size: 28px;
+.info-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 4px 20px rgba(18, 66, 101, 0.15);
+}
+
+.info-box i {
+  font-size: 36px;
+  color: #7712b4;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.info-box h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #7712b4;
+}
+
+.info-box p {
+  font-size: 14px;
+  line-height: 24px;
+  margin-bottom: 0;
+}
+
+.info-box p a {
+  color: #7712b4;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.info-box p a:hover {
+  color: #f9d380;
+}
+
+.contact .contact-boxes > [class*="col-"] {
+    display: flex;
+}
+
+.contact .contact-boxes .info-box {
+    width: 100%;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+@media (max-width: 767.98px) {
+    .contact .contact-boxes .info-box {
+        min-height: 180px;
     }
 }
+
+/*--------------------------------------------------------------
+# END style 
+--------------------------------------------------------------*/
