@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /img/Foto_uitgekozenSlof/
+Disallow: /img/
 
 Sitemap: https://herendispuutabraxas.nl/sitemap.xml
