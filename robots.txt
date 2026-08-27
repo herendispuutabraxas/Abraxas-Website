@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
+Allow: /img/ABRAXAS%20logo%20DEF.png
 Disallow: /img/
 
 Sitemap: https://herendispuutabraxas.nl/sitemap.xml
