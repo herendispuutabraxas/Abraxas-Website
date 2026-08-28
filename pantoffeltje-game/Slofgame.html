@@ -70,6 +70,9 @@
     max-width: 100%;
     z-index: 1;
   }
+  .game-container:has(.overlay:not(.hidden)) {
+    min-height: 260px;
+  }
   canvas {
     background: var(--pf-black);
     border: 4px solid var(--pf-gold);
@@ -84,7 +87,37 @@
     height: auto;
     display: block;
     cursor: pointer;
-    touch-action: manipulation;
+    touch-action: none;
+  }
+  .mobile-controls {
+    display: none;
+    margin-top: 1rem;
+    width: 100%;
+    max-width: 800px;
+    justify-content: center;
+    z-index: 1;
+    position: relative;
+  }
+  .duck-btn {
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    font-size: clamp(0.6rem, 2.2vw, 0.8rem);
+    letter-spacing: 1px;
+    color: var(--pf-cream);
+    background: linear-gradient(180deg, var(--pf-red), var(--pf-wine));
+    border: 3px solid var(--pf-gold);
+    border-radius: 8px;
+    padding: 16px 44px;
+    box-shadow: 0 0 0 2px var(--pf-black), 0 6px 16px rgba(0, 0, 0, 0.55);
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .duck-btn:active {
+    transform: translateY(2px) scale(0.97);
+    filter: brightness(1.15);
+  }
+  @media (pointer: coarse) {
+    .mobile-controls { display: flex; }
   }
   .score-panel {
     display: flex;
@@ -254,8 +287,12 @@
     <span class="high-score">RECORD: <span id="highScore">0</span>M</span>
   </div>
 
+  <div class="mobile-controls">
+    <button id="duckBtn" class="duck-btn" aria-label="Bukken" type="button">⬇ HOUD VAST OM TE BUKKEN</button>
+  </div>
+
   <p class="instruction">
-    SPATIE / W / TAP = SPRINGEN · PIJL OMLAAG / S = BUKKEN<br>
+    SPATIE / W / TAP = SPRINGEN · PIJL OMLAAG / S / BUK-KNOP = BUKKEN<br>
     Korte Putstraat 11 · 's-Hertogenbosch
   </p>
   <p class="footer">v2.0 — proost 🍻</p>
@@ -325,14 +362,16 @@
   const IMG = {
     bavaria: new Image(),
     barkruk: new Image(),
-    haan:    new Image()
+    haan:    new Image(),
+    slang:   new Image()
   };
   IMG.bavaria.src = 'assets/bavaria.png';
   IMG.barkruk.src = 'assets/barkruk.webp';
   IMG.haan.src    = 'assets/haan.png';
+  IMG.slang.src   = 'assets/slang.png';
 
   let loadedCount = 0;
-  const totalToLoad = 3;
+  const totalToLoad = 4;
   function onLoad() {
     loadedCount++;
     if (loadedCount === totalToLoad) {
@@ -483,118 +522,19 @@
       }
     },
     slang: {
-      w: 64, h: 44,
+      w: 39, h: 44,
       groundY: () => GROUND_Y - 40,
-      hitbox: { dx: 7, dy: 10, dw: -14, dh: -13 },
+      hitbox: { dx: 4, dy: 10, dw: -8, dh: -13 },
       draw(o) {
+        if (!IMG.slang.complete) return;
         // Schaduw
         ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
         ctx.beginPath();
         ctx.ellipse(o.x + o.w/2, GROUND_Y + 4, o.w/2, 3, 0, 0, Math.PI * 2);
         ctx.fill();
-
-        // Paarse pixel-slang met opgerichte nek (stijl van referentie) — groter/hoger voor herkenbaarheid
-        const s = 2.6;
-        const ox = (o.x | 0);
-        const wobble = Math.sin(frameCount * 0.18 + o.x * 0.03) * 0.8;
-        const oy = ((o.y + wobble) | 0);
-        const p = (x, y, w, h, color) => {
-          ctx.fillStyle = color;
-          ctx.fillRect(ox + x * s, oy + y * s, w * s, h * s);
-        };
-
-        const dark    = '#3e0b59';
-        const darker  = '#2a0740';
-        const mid     = '#6d1fa3';
-        const mid2    = '#8f33c8';
-        const hi      = '#ba62ee';
-        const hiBright = '#e6c6ff';
-        const belly   = '#d39df2';
-        const bellyDk = '#b877d9';
-        const scaleLn = '#4f1675';
-
-        // Achterste coil-lus (diepte-schaduw, suggereert een tweede wikkeling)
-        p(2, 9, 17, 3, darker);
-        p(4, 8, 12, 1, darker);
-
-        // Buitencontour voorste coil (torus-vorm)
-        p(0, 12, 25, 3, dark);
-        p(1, 11, 22, 1, dark);
-        p(2, 10, 18, 1, dark);
-        p(4, 9, 13, 1, dark);
-        p(1, 15, 22, 1, dark);
-        p(3, 16, 16, 1, dark);
-        p(6, 17, 9, 1, dark);
-
-        // Binnengat van de coil (torus-opening)
-        p(8, 12, 9, 3, darker);
-        p(9, 11, 7, 1, darker);
-        p(9, 15, 7, 1, darker);
-
-        // Coil-vulling rond het gat, in banden voor rondingseffect
-        p(1, 12, 7, 3, mid);
-        p(17, 12, 7, 3, mid);
-        p(4, 10, 14, 2, mid);
-        p(3, 15, 18, 1, mid2);
-        p(2, 13, 3, 1, mid2);
-        p(20, 13, 3, 1, mid2);
-
-        // Buik-schalen (segmenten) langs de onderkant van de coil
-        p(4, 16, 2, 1, belly);
-        p(8, 16, 2, 1, belly);
-        p(12, 16, 2, 1, belly);
-        p(16, 16, 2, 1, belly);
-        p(6, 14, 2, 1, bellyDk);
-        p(15, 14, 2, 1, bellyDk);
-
-        // Schubtextuur (kleine puntjes voor structuur, net als bij de haan)
-        [[2,11],[5,10],[8,10],[11,9],[15,10],[19,11],[22,12],
-         [3,13],[6,13],[10,13],[14,13],[18,13],[21,13],
-         [4,15],[9,14],[13,15],[17,14],[20,14]].forEach(([sx, sy]) => {
-          p(sx, sy, 1, 1, scaleLn);
-        });
-
-        // Highlight-rand bovenop de coil (lichtinval van linksboven)
-        p(3, 9, 12, 1, hi);
-        p(5, 8, 6, 1, hiBright);
-        p(1, 12, 1, 3, hi);
-
-        // Opgerichte nek en kop (driehoekiger, brede kaaklijn zoals referentie)
-        p(14, 4, 3, 7, dark);
-        p(15, 5, 1, 5, mid);
-        p(16, 5, 1, 4, mid2);
-        p(13, 2, 6, 3, dark);
-        p(12, 4, 7, 2, dark);
-        p(14, 3, 4, 1, mid);
-        p(13, 5, 5, 1, mid2);
-        p(15, 3, 2, 1, hi);
-        p(15, 2, 1, 1, hiBright);
-
-        // Wenkbrauwrichel
-        p(14, 1, 3, 1, hiBright);
-
-        // Open bek (donkere holte tussen de kaken)
-        p(13, 5, 3, 1, '#2a0710');
-
-        // Nek buiklijn
-        p(14, 6, 1, 4, belly);
-        p(15, 6, 1, 4, belly);
-
-        // Slagtanden
-        p(15, 6, 1, 2, '#f5e6c8');
-        p(17, 6, 1, 2, '#f5e6c8');
-
-        // Oog en gevorkte tong
-        p(16, 3, 1, 1, '#c12d49');
-        p(17, 3, 1, 1, '#180818');
-        p(15, 2, 1, 1, '#f7d5ff');
-        p(18, 4, 3, 1, '#f15b96');
-        p(21, 2, 1, 1, '#f15b96');
-        p(21, 3, 1, 1, '#f15b96');
-        p(21, 5, 1, 1, '#f15b96');
-        p(21, 6, 1, 1, '#f15b96');
-        p(12, 8, 1, 1, scaleLn);
-        p(13, 7, 1, 1, scaleLn);
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(IMG.slang, o.x, o.y, o.w, o.h);
+        ctx.imageSmoothingEnabled = false;
       }
     },
     haan: {
@@ -1047,13 +987,14 @@
       handleDuckRelease();
     }
   });
-  canvas.addEventListener('touchstart', (e) => {
+  const gameContainer = document.querySelector('.game-container');
+  gameContainer.addEventListener('touchstart', (e) => {
     e.preventDefault();
     handleInputPress();
   }, { passive: false });
-  canvas.addEventListener('touchend', handleInputRelease, { passive: true });
-  canvas.addEventListener('touchcancel', handleInputRelease, { passive: true });
-  canvas.addEventListener('mousedown', (e) => {
+  gameContainer.addEventListener('touchend', handleInputRelease, { passive: true });
+  gameContainer.addEventListener('touchcancel', handleInputRelease, { passive: true });
+  gameContainer.addEventListener('mousedown', (e) => {
     e.preventDefault();
     handleInputPress();
   });
@@ -1065,6 +1006,22 @@
   window.addEventListener('keydown', (e) => {
     if ((e.code === 'Space' || e.code === 'KeyW') && e.target === document.body) e.preventDefault();
   });
+
+  const duckBtn = document.getElementById('duckBtn');
+  duckBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    handleDuckPress();
+  }, { passive: false });
+  duckBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    handleDuckRelease();
+  }, { passive: false });
+  duckBtn.addEventListener('touchcancel', handleDuckRelease, { passive: true });
+  duckBtn.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    handleDuckPress();
+  });
+  window.addEventListener('mouseup', handleDuckRelease);
 
   // Bouw de vloerstrip alvast (hangt niet af van images)
   buildFloor();
