@@ -355,6 +355,8 @@
   let spawnCooldown = 60;
   let deathShake = 0;
   let sinceStartFrames = 0;
+  let lastTime = null;
+  const TARGET_FRAME_MS = 1000 / 60;
 
   document.getElementById('highScore').textContent = highScore;
 
@@ -799,24 +801,26 @@
   }
 
   // ============ UPDATE ============
-  function update() {
+  function update(dt) {
+    // dt = aantal "60fps-equivalente" frames sinds de vorige update (1 = precies 60fps).
+    // Zo blijft het spel even snel op elk scherm, of dat nu 30, 60 of 120fps haalt.
     if (gameState !== 'playing') {
-      if (deathShake > 0) deathShake -= 0.5;
+      if (deathShake > 0) deathShake -= 0.5 * dt;
       // Still animate background subtly on start/gameover?
       // Nee, static op start/gameover.
       return;
     }
 
-    frameCount++;
-    sinceStartFrames++;
+    frameCount += dt;
+    sinceStartFrames += dt;
 
     // Player physics
     if (player.jumping && isJumpHeld && player.vy < 0 && jumpHoldFrames < JUMP_HOLD_MAX) {
-      player.vy -= JUMP_HOLD_FORCE;
-      jumpHoldFrames++;
+      player.vy -= JUMP_HOLD_FORCE * dt;
+      jumpHoldFrames += dt;
     }
-    player.vy += GRAVITY;
-    player.y += player.vy;
+    player.vy += GRAVITY * dt;
+    player.y += player.vy * dt;
 
     if (player.y >= GROUND_Y - player.h) {
       player.y = GROUND_Y - player.h;
@@ -831,18 +835,18 @@
     }
 
     // Loopwiebel
-    player.bob += 0.35;
+    player.bob += 0.35 * dt;
 
     // Scroll
-    groundOffset += gameSpeed;
-    bgOffset += gameSpeed;
+    groundOffset += gameSpeed * dt;
+    bgOffset += gameSpeed * dt;
 
     // Move obstacles
-    obstacles.forEach(o => o.x -= gameSpeed);
+    obstacles.forEach(o => o.x -= gameSpeed * dt);
     obstacles = obstacles.filter(o => o.x + o.w > -30);
 
     // Spawn — timing gebaseerd op afstand, niet frames
-    spawnCooldown -= gameSpeed;
+    spawnCooldown -= gameSpeed * dt;
     if (spawnCooldown <= 0) {
       const lastObstacle = obstacles[obstacles.length - 1];
       const minGap = 220 + Math.random() * 260;
@@ -863,7 +867,7 @@
     }
 
     // Score
-    score += gameSpeed / 8;
+    score += (gameSpeed / 8) * dt;
     document.getElementById('score').textContent = Math.floor(score);
 
     // Rustiger tempo-opbouw: langzamer begin, minder snelle acceleratie
@@ -895,8 +899,14 @@
     }
   }
 
-  function loop() {
-    update();
+  function loop(timestamp) {
+    let dt = 1;
+    if (lastTime !== null) {
+      // Cap op 3x zodat een korte hapering (bv. na een gewisselde tab) geen grote sprong/teleportatie geeft.
+      dt = Math.min((timestamp - lastTime) / TARGET_FRAME_MS, 3);
+    }
+    lastTime = timestamp;
+    update(dt);
     draw();
     requestAnimationFrame(loop);
   }
@@ -1028,7 +1038,7 @@
   // Bouw achtergrond meteen zichtbaar (met of zonder images)
   buildBackground();
 
-  loop();
+  requestAnimationFrame(loop);
 })();
 </script>
 </body>
