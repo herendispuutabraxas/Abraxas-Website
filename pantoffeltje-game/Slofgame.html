@@ -339,14 +339,20 @@
     pear: '#7eaa3a',
     pearHi: '#a8cf59',
     pearDark: '#5a7d2c',
-    pearStem: '#6b3d22'
+    pearStem: '#6b3d22',
+    partyPink:   '#ff5fa2',
+    partyCyan:   '#4fd7e0',
+    partyYellow: '#ffe066',
+    partyGreen:  '#7ef2a0',
+    discoDark:   '#6b7280',
+    discoLight:  '#e5e7eb'
   };
 
   // ============ STATE ============
   let gameState = 'loading';
   let score = 0;
   let highScore = parseInt(localStorage.getItem('pantoffeltjeHighScore') || '0', 10);
-  let baseSpeed = 3.1;
+  let baseSpeed = 3.565; // 3.1 + 15%
   let gameSpeed = baseSpeed;
   let obstacles = [];
   let groundOffset = 0;
@@ -410,10 +416,11 @@
     bob: 0
   };
 
-  const GRAVITY = 0.55;
-  const JUMP_POWER = -12;
-  const JUMP_HOLD_MAX = 12;
-  const JUMP_HOLD_FORCE = 0.23;
+  const GRAVITY = 0.85;
+  const JUMP_POWER = -14.86; // +5% spronghoogte (hoogte schaalt met v², dus v * sqrt(1.05))
+  const JUMP_HOLD_MAX = 8;
+  const JUMP_HOLD_FORCE = 0.18;
+  const DUCK_FALL_SPEED = 13;
   let isJumpHeld = false;
   let jumpHoldFrames = 0;
 
@@ -435,6 +442,8 @@
       if (player.jumping) {
         // In de lucht: behoud ongeveer het midden zodat het niet teleport.
         player.y += (prevH - player.h) * 0.5;
+        // Duik-versnelling: meteen sneller naar beneden i.p.v. rustig uitzweven.
+        player.vy = Math.max(player.vy, DUCK_FALL_SPEED);
       } else {
         player.y = GROUND_Y - player.h;
       }
@@ -553,6 +562,16 @@
     }
   };
 
+  // ============ FEESTMODUS ============
+  // Elke 2800m breekt er 500m lang feest uit (net als de "nacht" in de Dino-game),
+  // en dat herhaalt zich daarna eindeloos (2800-3300, 5600-6100, 8400-8900, ...).
+  const PARTY_INTERVAL = 2800;
+  const PARTY_DURATION = 500;
+  function isPartyTime() {
+    if (score < PARTY_INTERVAL) return false; // niet meteen bij de start (0 % 2800 zou anders ook "feest" zijn)
+    return (score % PARTY_INTERVAL) < PARTY_DURATION;
+  }
+
   function pickObstacleType() {
     // Vroege game: alleen barkruk en slang. Hanen pas na 200m score.
     const r = Math.random();
@@ -593,9 +612,37 @@
   const stripCtx = bgStrip.getContext('2d');
   stripCtx.imageSmoothingEnabled = false;
 
+  // Tweede, feestelijke variant van dezelfde strip (voor de "feestcafe"-periodes)
+  const bgStripParty = document.createElement('canvas');
+  bgStripParty.width = BG_STRIP_W;
+  bgStripParty.height = PIX_H;
+  const stripCtxParty = bgStripParty.getContext('2d');
+  stripCtxParty.imageSmoothingEnabled = false;
+
   function px(ctx, x, y, w, h, color) {
     ctx.fillStyle = color;
     ctx.fillRect(x | 0, y | 0, w | 0, h | 0);
+  }
+
+  function drawPixelDiscoBall(c, x, y) {
+    // Klein hangend discoballetje: draad + bol met facetten
+    px(c, x, 0, 1, 6, PAL.woodD);
+    px(c, x - 4, y, 9, 9, PAL.discoDark);
+    px(c, x - 3, y + 1, 7, 7, PAL.discoLight);
+    // Facet-rooster
+    c.fillStyle = PAL.discoDark;
+    for (let fy = 0; fy < 8; fy += 2) {
+      for (let fx = ((fy / 2) % 2); fx < 8; fx += 2) {
+        c.fillRect(x - 4 + fx, y + fy, 1, 1);
+      }
+    }
+    // Highlight/sprankeling
+    px(c, x - 2, y + 1, 1, 1, PAL.cream);
+    px(c, x + 2, y + 5, 1, 1, PAL.cream);
+    // Kleine gekleurde lichtvlekjes rond de bal
+    px(c, x - 6, y + 3, 1, 1, PAL.partyPink);
+    px(c, x + 6, y + 2, 1, 1, PAL.partyCyan);
+    px(c, x - 5, y + 8, 1, 1, PAL.partyYellow);
   }
 
   function drawPixelPear(c, x, y) {
@@ -611,7 +658,11 @@
   }
 
   function buildBackground() {
-    const c = stripCtx;
+    buildBackgroundVariant(stripCtx, false);
+    buildBackgroundVariant(stripCtxParty, true);
+  }
+
+  function buildBackgroundVariant(c, party) {
     const w = BG_STRIP_W;
     const h = PIX_H;
 
@@ -681,45 +732,104 @@
       drawPixelPear(c, sx, shelfY - 7);
     });
 
-    // Hanglampjes (kleine gouden dots) op regelmatige afstanden
-    for (let x = 24; x < w; x += 48) {
-      // Draad
-      px(c, x, 0, 1, 6, PAL.woodD);
-      // Kap
-      px(c, x - 2, 6, 5, 2, PAL.woodD);
-      px(c, x - 1, 8, 3, 2, PAL.gold);
-      // Gloed pixel
-      px(c, x, 10, 1, 1, PAL.cream);
-      // Faint halo
-      c.fillStyle = 'rgba(212, 165, 72, 0.15)';
-      c.fillRect(x - 3, 7, 7, 6);
-    }
+    if (party) {
+      // Feestslinger met vlaggetjes, gespannen tussen twee "spijkers" bovenaan
+      const partyColors = [PAL.gold, PAL.partyPink, PAL.partyCyan, PAL.partyYellow, PAL.partyGreen];
+      c.strokeStyle = PAL.woodD;
+      c.lineWidth = 1;
+      for (let sx = 0; sx < w; sx += 60) {
+        c.beginPath();
+        c.moveTo(sx, 3);
+        c.quadraticCurveTo(sx + 30, 9, sx + 60, 3);
+        c.stroke();
+      }
+      let flagIndex = 0;
+      for (let x = 4; x < w; x += 8) {
+        const sag = Math.sin((x % 60) / 60 * Math.PI) * 6;
+        const flagY = 3 + sag;
+        const color = partyColors[flagIndex % partyColors.length];
+        flagIndex++;
+        c.fillStyle = color;
+        c.beginPath();
+        c.moveTo(x - 3, flagY);
+        c.lineTo(x + 3, flagY);
+        c.lineTo(x, flagY + 6);
+        c.closePath();
+        c.fill();
+      }
 
-    // Ingelijst "portret" op de muur (soort van kruispunt schilderij)
-    for (let fx = 40; fx < w; fx += 200) {
-      const fy = 18;
-      const fw = 22, fh = 14;
-      // Lijst
-      px(c, fx, fy, fw, fh, PAL.gold);
-      px(c, fx + 1, fy + 1, fw - 2, fh - 2, PAL.wine);
-      // "Foto"
-      px(c, fx + 3, fy + 3, fw - 6, fh - 6, PAL.woodM);
-      // Silhouet
-      px(c, fx + fw/2 - 1, fy + 5, 2, 3, PAL.dark); // hoofd
-      px(c, fx + fw/2 - 2, fy + 8, 4, 4, PAL.dark); // torso
+      // Discoballen op regelmatige afstanden i.p.v. hanglampjes/portretten
+      for (let x = 60; x < w; x += 150) {
+        drawPixelDiscoBall(c, x, 14);
+      }
+    } else {
+      // Hanglampjes (kleine gouden dots) op regelmatige afstanden
+      for (let x = 24; x < w; x += 48) {
+        // Draad
+        px(c, x, 0, 1, 6, PAL.woodD);
+        // Kap
+        px(c, x - 2, 6, 5, 2, PAL.woodD);
+        px(c, x - 1, 8, 3, 2, PAL.gold);
+        // Gloed pixel
+        px(c, x, 10, 1, 1, PAL.cream);
+        // Faint halo
+        c.fillStyle = 'rgba(212, 165, 72, 0.15)';
+        c.fillRect(x - 3, 7, 7, 6);
+      }
+
+      // Ingelijst "portret" op de muur (soort van kruispunt schilderij)
+      for (let fx = 40; fx < w; fx += 200) {
+        const fy = 18;
+        const fw = 22, fh = 14;
+        // Lijst
+        px(c, fx, fy, fw, fh, PAL.gold);
+        px(c, fx + 1, fy + 1, fw - 2, fh - 2, PAL.wine);
+        // "Foto"
+        px(c, fx + 3, fy + 3, fw - 6, fh - 6, PAL.woodM);
+        // Silhouet
+        px(c, fx + fw/2 - 1, fy + 5, 2, 3, PAL.dark); // hoofd
+        px(c, fx + fw/2 - 2, fy + 8, 4, 4, PAL.dark); // torso
+      }
     }
   }
 
   function drawBackgroundPixels() {
     // Teken de strip 2x om naadloos scrollen te krijgen
     bgCtx.clearRect(0, 0, PIX_W, PIX_H);
+    const activeStrip = isPartyTime() ? bgStripParty : bgStrip;
     const scroll = (bgOffset * 0.15 / PIX_SCALE) % BG_STRIP_W;
-    bgCtx.drawImage(bgStrip, -scroll, 0);
-    bgCtx.drawImage(bgStrip, -scroll + BG_STRIP_W, 0);
+    bgCtx.drawImage(activeStrip, -scroll, 0);
+    bgCtx.drawImage(activeStrip, -scroll + BG_STRIP_W, 0);
 
     // Nu upscalen naar main canvas
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(bgCanvas, 0, 0, W, GROUND_Y);
+  }
+
+  function drawDiscoOverlay() {
+    // Zwenkende, gekleurde discolichten over de muur tijdens feestperiodes
+    if (!isPartyTime()) return;
+    const colors = ['rgba(255,95,162,0.16)', 'rgba(79,215,224,0.16)', 'rgba(255,224,102,0.14)', 'rgba(126,242,160,0.14)'];
+    const origins = [0.15, 0.4, 0.65, 0.88].map(f => W * f);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, W, GROUND_Y);
+    ctx.clip();
+    ctx.globalCompositeOperation = 'lighter';
+    origins.forEach((ox, i) => {
+      const sway = Math.sin(frameCount * 0.03 + i * 2.1) * 90;
+      const bottomX = ox + sway;
+      const halfSpread = 55;
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.beginPath();
+      ctx.moveTo(ox, 0);
+      ctx.lineTo(bottomX - halfSpread, GROUND_Y);
+      ctx.lineTo(bottomX + halfSpread, GROUND_Y);
+      ctx.closePath();
+      ctx.fill();
+    });
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.restore();
   }
 
   // ============ HOUTEN VLOER (ook pixelart, aparte prebake) ============
@@ -887,6 +997,7 @@
     }
 
     drawBackgroundPixels();
+    drawDiscoOverlay();
     drawFloor();
 
     // Obstakels tekenen — hanen laatst (voor de andere) omdat ze in de lucht zijn
@@ -919,6 +1030,7 @@
     obstacles = [];
     frameCount = 0;
     sinceStartFrames = 0;
+    deathShake = 0;
     spawnCooldown = 120; // eerste obstakel wat later
     player.y = GROUND_Y - player.h;
     player.vy = 0;
