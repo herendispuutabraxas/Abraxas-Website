@@ -215,6 +215,77 @@ h6 {
     color: #f9d380;
 }
 
+.mobile-nav-toggle {
+    color: #f9d380;
+    font-size: 28px;
+    cursor: pointer;
+    display: none;
+    line-height: 0;
+    transition: 0.5s;
+}
+
+@media (max-width: 991px) {
+    .mobile-nav-toggle {
+        display: block;
+    }
+
+    .navbar ul {
+        display: none;
+    }
+
+    .navbar-mobile {
+        position: fixed;
+        overflow: hidden;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        background: rgba(24, 8, 8, 0.9);
+        transition: 0.3s;
+        z-index: 999;
+    }
+
+    .navbar-mobile .mobile-nav-toggle {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: #fff;
+    }
+
+    .navbar-mobile ul {
+        display: block;
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        left: 20px;
+        padding: 12px 0;
+        margin: 0;
+        background: #fff;
+        overflow-y: auto;
+        transition: 0.3s;
+        border-radius: 8px;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .navbar-mobile a,
+    .navbar-mobile a:focus {
+        display: block;
+        padding: 12px 20px;
+        color: #7712b4;
+        font-size: 16px;
+        white-space: normal;
+        justify-content: flex-start;
+    }
+
+    .navbar-mobile a:hover,
+    .navbar-mobile .active,
+    .navbar-mobile .active:focus,
+    .navbar-mobile li:hover>a {
+        color: #7712b4;
+        background: #f4e9fb;
+    }
+}
+
 
 /*--------------------------------------------------------------
 # Hero Section
@@ -351,6 +422,25 @@ h6 {
     #hero h2 {
         font-size: 18px;
         line-height: 24px;
+    }
+}
+
+@media (max-width: 767px) {
+    #hero .icon-box {
+        padding: 20px 12px;
+    }
+    #hero .icon-box .icon {
+        font-size: 28px;
+        margin-bottom: 10px;
+        padding-top: 0;
+    }
+    #hero .icon-box .title {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+    #hero .icon-box .description {
+        font-size: 12px;
+        line-height: 18px;
     }
 }
 
@@ -1043,6 +1133,23 @@ section {
     font-size: 14px;
     line-height: 26px;
     color: #777777;
+}
+
+@media (max-width: 767px) {
+    .team .member .member-img {
+        height: 140px;
+    }
+    .team .member .member-info {
+        padding: 10px 6px;
+    }
+    .team .member .member-info h4 {
+        font-size: 12px;
+        line-height: 15px;
+        margin-bottom: 3px;
+    }
+    .team .member .member-info span {
+        font-size: 10px;
+    }
 }
 
 .team .member:hover .social {
